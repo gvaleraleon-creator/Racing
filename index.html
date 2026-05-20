@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Racing Ahorro">
+<meta name="theme-color" content="#0d1f13">
+<title>Racing Ahorro</title>
+<link rel="manifest" href="manifest.json">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Figtree:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --verde: #1e8c4a;
+  --verde2: #25b05d;
+  --verde-dim: #0f4726;
+  --oro: #d4a843;
+  --oro-dim: #4a3510;
+  --bg: #0a130d;
+  --bg2: #111a13;
+  --bg3: #182018;
+  --card: #141e16;
+  --border: #1e2e20;
+  --text: #e8f0ea;
+  --muted: #5a7860;
+  --danger: #e05050;
+  --radius: 14px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+body {
+  font-family: 'Figtree', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100dvh;
+  overflow-x: hidden;
+  overscroll-behavior: none;
+}
+
+/* NAV TABS */
+.nav {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  display: flex;
+  padding-bottom: var(--safe-bottom);
+  z-index: 100;
+}
+.nav-btn {
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 3px;
+  padding: 10px 0 8px;
+  background: none; border: none;
+  color: var(--muted);
+  font-family: 'Figtree', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.nav-btn.active { color: var(--verde2); }
+.nav-btn svg { width: 22px; height: 22px; }
+
+/* PAGES */
+.page { display: none; padding: 0 0 90px; min-height: 100dvh; }
+.page.active { display: block; }
+
+/* TOP BAR */
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 20px 0;
+  margin-bottom: 6px;
+}
+.topbar-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.6rem;
+  letter-spacing: 2px;
+  color: var(--text);
+}
+.topbar-badge {
+  background: var(--verde-dim);
+  color: var(--verde2);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+/* HERO RINGS */
+.hero {
+  padding: 20px 20px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.rings-wrap {
+  position: relative;
+  width: 200px; height: 200px;
+}
+.ring-svg { position: absolute; top: 0; left: 0; }
+.ring-center {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  text-align: center;
+}
+.ring-pct {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2.8rem;
+  line-height: 1;
+  color: var(--text);
+}
+.ring-label { font-size: 0.65rem; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-top: 2px; }
+
+/* STAT CARDS */
+.stat-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 14px 16px 0;
+}
+.stat-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  position: relative;
+  overflow: hidden;
+}
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+}
+.stat-card.verde::before { background: var(--verde2); }
+.stat-card.oro::before { background: var(--oro); }
+.stat-card.danger::before { background: var(--danger); }
+.stat-card.blue::before { background: #5b8af5; }
+
+.stat-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.stat-value {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.8rem;
+  line-height: 1;
+}
+.stat-card.verde .stat-value { color: var(--verde2); }
+.stat-card.oro .stat-value { color: var(--oro); }
+.stat-card.danger .stat-value { color: var(--danger); }
+.stat-card.blue .stat-value { color: #5b8af5; }
+.stat-sub { font-size: 0.7rem; color: var(--muted); margin-top: 3px; }
+
+/* PROGRESS BAR */
+.prog-section { padding: 14px 16px 0; }
+.prog-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+.prog-name { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.5px; }
+.prog-pct { font-size: 0.75rem; color: var(--muted); }
+.prog-track {
+  background: var(--bg3);
+  border-radius: 4px;
+  height: 8px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+.prog-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.prog-fill.verde { background: linear-gradient(90deg, var(--verde), var(--verde2)); }
+.prog-fill.oro { background: linear-gradient(90deg, #a07820, var(--oro)); }
+
+/* SECTION HEADER */
+.section-hdr {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 16px 10px;
+}
+.section-hdr h2 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 2px;
+  color: var(--muted);
+}
+
+/* MOVIMIENTO LIST */
+.mov-list { padding: 0 16px; }
+.mov-item {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 8px;
+  animation: slideIn 0.25s ease;
+}
+@keyframes slideIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+.mov-icon {
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+.mov-icon.semanal { background: var(--verde-dim); }
+.mov-icon.extra { background: var(--oro-dim); }
+.mov-icon.gasto { background: #2d1010; }
+
+.mov-info { flex: 1; min-width: 0; }
+.mov-desc { font-size: 0.85rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mov-meta { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+
+.mov-amount {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.1rem;
+  white-space: nowrap;
+}
+.mov-amount.pos { color: var(--verde2); }
+.mov-amount.neg { color: var(--danger); }
+
+.mov-delete {
+  background: none; border: none;
+  color: #333; cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  transition: color 0.2s;
+}
+.mov-delete:hover { color: var(--danger); }
+
+.empty-state {
+  text-align: center;
+  color: var(--muted);
+  padding: 40px 20px;
+  font-size: 0.85rem;
+}
+.empty-state .big { font-size: 2.5rem; margin-bottom: 8px; }
+
+/* FLOATING ACTION BUTTON */
+.fab {
+  position: fixed;
+  bottom: calc(70px + var(--safe-bottom));
+  right: 20px;
+  width: 56px; height: 56px;
+  border-radius: 16px;
+  background: var(--verde);
+  border: none;
+  color: white;
+  font-size: 1.6rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 20px rgba(30,140,74,0.4);
+  transition: transform 0.15s, background 0.15s;
+  z-index: 50;
+}
+.fab:active { transform: scale(0.92); background: var(--verde2); }
+
+/* MODAL */
+.overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.75);
+  backdrop-filter: blur(4px);
+  z-index: 200;
+  display: none;
+  align-items: flex-end;
+}
+.overlay.open { display: flex; }
+
+.sheet {
+  width: 100%;
+  background: var(--bg2);
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  padding: 12px 20px 24px;
+  padding-bottom: calc(24px + var(--safe-bottom));
+  animation: sheetUp 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes sheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+.sheet-handle {
+  width: 36px; height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  margin: 0 auto 16px;
+}
+.sheet-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.4rem;
+  letter-spacing: 2px;
+  margin-bottom: 16px;
+}
+
+.form-group { margin-bottom: 14px; }
+.form-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 6px; display: block; }
+
+.form-input, .form-select {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-family: 'Figtree', sans-serif;
+  font-size: 1rem;
+  padding: 12px 14px;
+  outline: none;
+  -webkit-appearance: none;
+}
+.form-input:focus, .form-select:focus { border-color: var(--verde); }
+.form-input[type="number"] { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; text-align: center; letter-spacing: 2px; }
+
+.type-selector {
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px; margin-bottom: 14px;
+}
+.type-btn {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 6px;
+  color: var(--muted);
+  font-family: 'Figtree', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.type-btn.selected { border-color: var(--verde); background: var(--verde-dim); color: var(--verde2); }
+.type-btn.selected.oro-type { border-color: var(--oro); background: var(--oro-dim); color: var(--oro); }
+.type-btn.selected.danger-type { border-color: var(--danger); background: #2d1010; color: var(--danger); }
+
+.cuenta-selector {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 8px; margin-bottom: 14px;
+}
+.cuenta-btn {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.cuenta-btn.selected.racing { border-color: var(--verde2); background: var(--verde-dim); color: var(--verde2); }
+.cuenta-btn.selected.general { border-color: var(--oro); background: var(--oro-dim); color: var(--oro); }
+
+.btn-primary {
+  width: 100%;
+  background: var(--verde);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 15px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 2px;
+  cursor: pointer;
+  margin-top: 4px;
+  transition: background 0.15s;
+}
+.btn-primary:active { background: var(--verde2); }
+
+/* OBJETIVO PAGE */
+.obj-card {
+  margin: 14px 16px 0;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+}
+.obj-card-title {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--muted);
+  margin-bottom: 12px;
+  display: flex; align-items: center; gap: 6px;
+}
+.obj-card-title span { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+
+.obj-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.85rem;
+}
+.obj-row:last-child { border-bottom: none; }
+.obj-row-label { color: var(--muted); }
+.obj-row-val { font-weight: 600; }
+
+.escenario-row {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 0 16px;
+  margin-top: 10px;
+}
+.esc {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+}
+.esc-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 0.95rem;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+.esc.verde .esc-title { color: var(--verde2); }
+.esc.oro .esc-title { color: var(--oro); }
+.esc-line { font-size: 0.72rem; color: var(--muted); margin-bottom: 3px; }
+.esc-line span { color: var(--text); font-weight: 600; }
+
+/* SEMANA INFO */
+.week-badge {
+  margin: 14px 16px 0;
+  background: var(--verde-dim);
+  border: 1px solid var(--verde);
+  border-radius: 10px;
+  padding: 12px 16px;
+  display: flex; align-items: center; gap: 12px;
+}
+.week-badge-icon { font-size: 1.8rem; }
+.week-badge-text { font-size: 0.8rem; color: var(--verde2); line-height: 1.5; }
+.week-badge-text strong { font-size: 0.95rem; color: white; display: block; }
+
+/* SETTINGS */
+.settings-card {
+  margin: 14px 16px 0;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.setting-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.setting-row:last-child { border-bottom: none; }
+.setting-label { font-size: 0.85rem; font-weight: 500; }
+.setting-sub { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+.setting-val { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; color: var(--verde2); }
+
+.btn-danger {
+  display: block;
+  margin: 14px 16px 0;
+  width: calc(100% - 32px);
+  background: #1e0a0a;
+  border: 1px solid var(--danger);
+  color: var(--danger);
+  border-radius: 10px;
+  padding: 13px;
+  font-family: 'Figtree', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+}
+
+/* SCROLLABLE */
+.scroll-area { overflow-y: auto; }
+
+</style>
+</head>
+<body>
+
+<!-- PAGES -->
+
+<!-- ===== HOME ===== -->
+<div class="page active" id="page-home">
+  <div class="topbar">
+    <div class="topbar-title">Racing Ahorro</div>
+    <div class="topbar-badge" id="semana-badge">SEM 1</div>
+  </div>
+
+  <div class="hero">
+    <div class="rings-wrap">
+      <svg class="ring-svg" width="200" height="200" viewBox="0 0 200 200">
+        <!-- Racing track -->
+        <circle cx="100" cy="100" r="76" fill="none" stroke="#1e2e20" stroke-width="14"/>
+        <circle cx="100" cy="100" r="76" fill="none" stroke="url(#gVerde)" stroke-width="14"
+          stroke-dasharray="477.5" id="ring-racing-fill"
+          stroke-linecap="round"
+          transform="rotate(-90 100 100)" stroke-dashoffset="477.5"/>
+        <!-- General track -->
+        <circle cx="100" cy="100" r="56" fill="none" stroke="#1e2e20" stroke-width="12"/>
+        <circle cx="100" cy="100" r="56" fill="none" stroke="url(#gOro)" stroke-width="12"
+          stroke-dasharray="351.7" id="ring-general-fill"
+          stroke-linecap="round"
+          transform="rotate(-90 100 100)" stroke-dashoffset="351.7"/>
+        <defs>
+          <linearGradient id="gVerde" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#1e8c4a"/>
+            <stop offset="100%" stop-color="#25b05d"/>
+          </linearGradient>
+          <linearGradient id="gOro" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#a07820"/>
+            <stop offset="100%" stop-color="#d4a843"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <div class="ring-center">
+        <div class="ring-pct" id="ring-pct-text">0%</div>
+        <div class="ring-label">RACING</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat-card verde">
+      <div class="stat-label">🟢 Cuenta Racing</div>
+      <div class="stat-value" id="stat-racing">0,00 €</div>
+      <div class="stat-sub">Objetivo: <span id="obj-racing-lbl">252 €</span></div>
+    </div>
+    <div class="stat-card oro">
+      <div class="stat-label">🟡 Cuenta General</div>
+      <div class="stat-value" id="stat-general">0,00 €</div>
+      <div class="stat-sub">Objetivo: <span id="obj-general-lbl">468 €</span></div>
+    </div>
+  </div>
+
+  <div class="prog-section">
+    <div class="prog-header">
+      <span class="prog-name" style="color:var(--verde2)">Racing</span>
+      <span class="prog-pct" id="pct-racing-txt">0%</span>
+    </div>
+    <div class="prog-track"><div class="prog-fill verde" id="bar-racing" style="width:0%"></div></div>
+    <div class="prog-header">
+      <span class="prog-name" style="color:var(--oro)">General</span>
+      <span class="prog-pct" id="pct-general-txt">0%</span>
+    </div>
+    <div class="prog-track"><div class="prog-fill oro" id="bar-general" style="width:0%"></div></div>
+  </div>
+
+  <div class="section-hdr">
+    <h2>Últimos movimientos</h2>
+  </div>
+  <div class="mov-list" id="mov-list-home">
+    <div class="empty-state">
+      <div class="big">💰</div>
+      Aún no hay movimientos.<br>Pulsa + para añadir uno.
+    </div>
+  </div>
+</div>
+
+<!-- ===== MOVIMIENTOS ===== -->
+<div class="page" id="page-movs">
+  <div class="topbar">
+    <div class="topbar-title">Movimientos</div>
+    <div class="topbar-badge" id="total-movs-badge">0</div>
+  </div>
+  <div class="mov-list" id="mov-list-all" style="padding: 14px 16px 0;">
+    <div class="empty-state">
+      <div class="big">📋</div>
+      Sin movimientos aún.
+    </div>
+  </div>
+</div>
+
+<!-- ===== OBJETIVO ===== -->
+<div class="page" id="page-obj">
+  <div class="topbar">
+    <div class="topbar-title">Objetivo</div>
+  </div>
+
+  <div id="week-info" class="week-badge">
+    <div class="week-badge-icon">📅</div>
+    <div class="week-badge-text">
+      <strong id="week-title">Semana 1 de 52</strong>
+      <span id="week-sub">Septiembre 2025</span>
+    </div>
+  </div>
+
+  <div class="obj-card" style="margin-top:14px">
+    <div class="obj-card-title"><span style="background:var(--verde2)"></span> Cuenta Racing</div>
+    <div class="obj-row"><span class="obj-row-label">Ahorrado</span><span class="obj-row-val" id="obj-ahorrado-rac" style="color:var(--verde2)">0,00 €</span></div>
+    <div class="obj-row"><span class="obj-row-label">Objetivo mínimo (2ª División)</span><span class="obj-row-val">252 €</span></div>
+    <div class="obj-row"><span class="obj-row-label">Faltan</span><span class="obj-row-val" id="obj-faltan-rac">252,00 €</span></div>
+  </div>
+
+  <div class="obj-card">
+    <div class="obj-card-title"><span style="background:var(--oro)"></span> Cuenta General</div>
+    <div class="obj-row"><span class="obj-row-label">Ahorrado</span><span class="obj-row-val" id="obj-ahorrado-gen" style="color:var(--oro)">0,00 €</span></div>
+    <div class="obj-row"><span class="obj-row-label">Objetivo</span><span class="obj-row-val">468 €</span></div>
+    <div class="obj-row"><span class="obj-row-label">Faltan</span><span class="obj-row-val" id="obj-faltan-gen">468,00 €</span></div>
+  </div>
+
+  <div class="section-hdr" style="padding-top:18px"><h2>Escenarios Primera División</h2></div>
+  <div class="escenario-row">
+    <div class="esc verde">
+      <div class="esc-title">✅ Optimista</div>
+      <div class="esc-line">Precio estimado: <span>~330 €</span></div>
+      <div class="esc-line">Extra necesario: <span id="esc1-extra">78 €</span></div>
+      <div class="esc-line">General restante: <span id="esc1-resto">390 €</span></div>
+    </div>
+    <div class="esc oro">
+      <div class="esc-title">⚠️ Pesimista</div>
+      <div class="esc-line">Precio estimado: <span>~380 €</span></div>
+      <div class="esc-line">Extra necesario: <span id="esc2-extra">128 €</span></div>
+      <div class="esc-line">General restante: <span id="esc2-resto">340 €</span></div>
+    </div>
+  </div>
+
+  <div class="obj-card" style="margin-top:10px">
+    <div class="obj-card-title"><span style="background:#5b8af5"></span> Ritmo semanal</div>
+    <div class="obj-row"><span class="obj-row-label">Semanas transcurridas</span><span class="obj-row-val" id="sem-pasadas">0</span></div>
+    <div class="obj-row"><span class="obj-row-label">Media Racing / sem</span><span class="obj-row-val" id="media-racing">—</span></div>
+    <div class="obj-row"><span class="obj-row-label">Ritmo necesario (resto)</span><span class="obj-row-val" id="ritmo-necesario">4,85 €</span></div>
+  </div>
+</div>
+
+<!-- ===== SETTINGS ===== -->
+<div class="page" id="page-settings">
+  <div class="topbar">
+    <div class="topbar-title">Ajustes</div>
+  </div>
+
+  <div class="settings-card">
+    <div class="setting-row">
+      <div><div class="setting-label">Objetivo Racing</div><div class="setting-sub">Abono Preferencia Sur</div></div>
+      <div class="setting-val">252 €</div>
+    </div>
+    <div class="setting-row">
+      <div><div class="setting-label">Objetivo General</div><div class="setting-sub">Ahorro anual</div></div>
+      <div class="setting-val">468 €</div>
+    </div>
+    <div class="setting-row">
+      <div><div class="setting-label">Ingreso semanal base</div><div class="setting-sub">Sin extras</div></div>
+      <div class="setting-val">20 €</div>
+    </div>
+    <div class="setting-row">
+      <div><div class="setting-label">Inicio plan</div><div class="setting-sub">Semana 1</div></div>
+      <div class="setting-val">SEP 2025</div>
+    </div>
+  </div>
+
+  <div style="padding: 14px 16px 0">
+    <p style="font-size:0.75rem; color:var(--muted); line-height:1.6">
+      Los datos se guardan en tu dispositivo. Si borras la caché del navegador perderás el historial. Guarda capturas de pantalla como respaldo.
+    </p>
+  </div>
+
+  <button class="btn-danger" id="btn-reset" onclick="resetApp()">🗑 Borrar todos los datos</button>
+</div>
+
+<!-- NAV -->
+<nav class="nav">
+  <button class="nav-btn active" onclick="goPage('home',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    Inicio
+  </button>
+  <button class="nav-btn" onclick="goPage('movs',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+    Historial
+  </button>
+  <button class="nav-btn" onclick="goPage('obj',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+    Objetivo
+  </button>
+  <button class="nav-btn" onclick="goPage('settings',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+    Ajustes
+  </button>
+</nav>
+
+<!-- FAB -->
+<button class="fab" id="fab-btn" onclick="openModal()">+</button>
+
+<!-- MODAL -->
+<div class="overlay" id="overlay" onclick="closeModalOutside(event)">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Añadir movimiento</div>
+
+    <label class="form-label">Tipo</label>
+    <div class="type-selector">
+      <div class="type-btn selected" data-type="semanal" onclick="selectType(this,'semanal')">📅<br>Semanal</div>
+      <div class="type-btn oro-type" data-type="extra" onclick="selectType(this,'extra')">💵<br>Extra</div>
+      <div class="type-btn danger-type" data-type="gasto" onclick="selectType(this,'gasto')">💸<br>Gasto</div>
+    </div>
+
+    <label class="form-label">Cuenta destino</label>
+    <div class="cuenta-selector">
+      <div class="cuenta-btn selected racing" data-cuenta="racing" onclick="selectCuenta(this,'racing')">🟢 Racing</div>
+      <div class="cuenta-btn general" data-cuenta="general" onclick="selectCuenta(this,'general')">🟡 General</div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Cantidad (€)</label>
+      <input class="form-input" type="number" id="input-cantidad" placeholder="0.00" step="0.01" min="0">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Nota (opcional)</label>
+      <input class="form-input" type="text" id="input-nota" placeholder="Ej: Semana 1, regalo, etc." maxlength="40">
+    </div>
+
+    <button class="btn-primary" onclick="guardarMovimiento()">GUARDAR</button>
+  </div>
+</div>
+
+<script>
+// ── STATE ──────────────────────────────────────────────────────
+const OBJ_RACING = 252;
+const OBJ_GENERAL = 468;
+const RING_R_OUTER = 76;
+const RING_R_INNER = 56;
+
+let movimientos = JSON.parse(localStorage.getItem('racing_movs') || '[]');
+let selectedType = 'semanal';
+let selectedCuenta = 'racing';
+
+// ── NAV ────────────────────────────────────────────────────────
+function goPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  btn.classList.add('active');
+  // Show/hide FAB only on home
+  document.getElementById('fab-btn').style.display = (id === 'home' || id === 'movs') ? 'flex' : 'none';
+  if (id === 'obj') updateObj();
+}
+
+// ── MODAL ──────────────────────────────────────────────────────
+function openModal() {
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('input-cantidad').focus();
+}
+function closeModal() {
+  document.getElementById('overlay').classList.remove('open');
+  document.getElementById('input-cantidad').value = '';
+  document.getElementById('input-nota').value = '';
+}
+function closeModalOutside(e) {
+  if (e.target === document.getElementById('overlay')) closeModal();
+}
+
+function selectType(el, type) {
+  document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedType = type;
+}
+function selectCuenta(el, cuenta) {
+  document.querySelectorAll('.cuenta-btn').forEach(b => b.classList.remove('selected','racing','general'));
+  el.classList.add('selected', cuenta);
+  selectedCuenta = cuenta;
+}
+
+// ── GUARDAR ────────────────────────────────────────────────────
+function guardarMovimiento() {
+  const cant = parseFloat(document.getElementById('input-cantidad').value);
+  if (!cant || cant <= 0) { alert('Introduce una cantidad válida.'); return; }
+  const nota = document.getElementById('input-nota').value.trim();
+  const mov = {
+    id: Date.now(),
+    tipo: selectedType,
+    cuenta: selectedCuenta,
+    cantidad: selectedType === 'gasto' ? -Math.abs(cant) : Math.abs(cant),
+    nota: nota || (selectedType === 'semanal' ? 'Ahorro semanal' : selectedType === 'extra' ? 'Ingreso extra' : 'Gasto'),
+    fecha: new Date().toLocaleDateString('es-ES', { day:'2-digit', month:'short' })
+  };
+  movimientos.unshift(mov);
+  save();
+  closeModal();
+  render();
+}
+
+// ── SAVE ───────────────────────────────────────────────────────
+function save() {
+  localStorage.setItem('racing_movs', JSON.stringify(movimientos));
+}
+
+// ── CALCULAR TOTALES ───────────────────────────────────────────
+function totales() {
+  let racing = 0, general = 0;
+  movimientos.forEach(m => {
+    if (m.cuenta === 'racing') racing += m.cantidad;
+    else general += m.cantidad;
+  });
+  return { racing: Math.max(0, racing), general: Math.max(0, general) };
+}
+
+function semanaActual() {
+  const inicio = new Date(2025, 8, 1); // sep 2025
+  const hoy = new Date();
+  const diff = Math.floor((hoy - inicio) / (7 * 24 * 3600 * 1000));
+  return Math.min(Math.max(diff + 1, 1), 52);
+}
+
+// ── RENDER ─────────────────────────────────────────────────────
+function render() {
+  const { racing, general } = totales();
+  const pctR = Math.min((racing / OBJ_RACING) * 100, 100);
+  const pctG = Math.min((general / OBJ_GENERAL) * 100, 100);
+
+  // Rings
+  const circumR = 2 * Math.PI * RING_R_OUTER;
+  const circumG = 2 * Math.PI * RING_R_INNER;
+  document.getElementById('ring-racing-fill').style.strokeDashoffset = circumR * (1 - pctR/100);
+  document.getElementById('ring-general-fill').style.strokeDashoffset = circumG * (1 - pctG/100);
+  document.getElementById('ring-pct-text').textContent = Math.round(pctR) + '%';
+
+  // Stats
+  document.getElementById('stat-racing').textContent = fmt(racing);
+  document.getElementById('stat-general').textContent = fmt(general);
+  document.getElementById('bar-racing').style.width = pctR + '%';
+  document.getElementById('bar-general').style.width = pctG + '%';
+  document.getElementById('pct-racing-txt').textContent = Math.round(pctR) + '%';
+  document.getElementById('pct-general-txt').textContent = Math.round(pctG) + '%';
+
+  // Week badge
+  const sem = semanaActual();
+  document.getElementById('semana-badge').textContent = 'SEM ' + sem;
+
+  // Mov list home (last 5)
+  renderMovList('mov-list-home', movimientos.slice(0, 5));
+  renderMovList('mov-list-all', movimientos);
+  document.getElementById('total-movs-badge').textContent = movimientos.length;
+}
+
+function fmt(n) {
+  return n.toFixed(2).replace('.', ',') + ' €';
+}
+
+function renderMovList(id, list) {
+  const el = document.getElementById(id);
+  if (!list.length) {
+    el.innerHTML = '<div class="empty-state"><div class="big">💰</div>Sin movimientos aún.</div>';
+    return;
+  }
+  el.innerHTML = list.map(m => {
+    const isPos = m.cantidad >= 0;
+    const icon = m.tipo === 'semanal' ? '📅' : m.tipo === 'extra' ? '💵' : '💸';
+    const iconClass = m.tipo === 'semanal' ? 'semanal' : m.tipo === 'extra' ? 'extra' : 'gasto';
+    const cuentaLabel = m.cuenta === 'racing' ? '🟢 Racing' : '🟡 General';
+    return `<div class="mov-item">
+      <div class="mov-icon ${iconClass}">${icon}</div>
+      <div class="mov-info">
+        <div class="mov-desc">${m.nota}</div>
+        <div class="mov-meta">${m.fecha} · ${cuentaLabel}</div>
+      </div>
+      <div class="mov-amount ${isPos ? 'pos' : 'neg'}">${isPos ? '+' : ''}${fmt(m.cantidad)}</div>
+      <button class="mov-delete" onclick="borrar(${m.id})">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+      </button>
+    </div>`;
+  }).join('');
+}
+
+function borrar(id) {
+  if (!confirm('¿Borrar este movimiento?')) return;
+  movimientos = movimientos.filter(m => m.id !== id);
+  save();
+  render();
+  updateObj();
+}
+
+function updateObj() {
+  const { racing, general } = totales();
+  document.getElementById('obj-ahorrado-rac').textContent = fmt(racing);
+  document.getElementById('obj-ahorrado-gen').textContent = fmt(general);
+  document.getElementById('obj-faltan-rac').textContent = fmt(Math.max(0, OBJ_RACING - racing));
+  document.getElementById('obj-faltan-gen').textContent = fmt(Math.max(0, OBJ_GENERAL - general));
+
+  const sem = semanaActual();
+  const semsRestantes = Math.max(1, 52 - sem);
+  document.getElementById('sem-pasadas').textContent = sem;
+
+  const mediaR = movimientos.filter(m => m.cuenta === 'racing').length
+    ? (racing / Math.max(sem,1)).toFixed(2).replace('.',',') + ' €'
+    : '—';
+  document.getElementById('media-racing').textContent = mediaR;
+
+  const ritmo = Math.max(0, (OBJ_RACING - racing) / semsRestantes).toFixed(2).replace('.',',') + ' €';
+  document.getElementById('ritmo-necesario').textContent = ritmo;
+
+  // Escenarios con general actual
+  const extra1 = Math.max(0, 330 - racing);
+  const extra2 = Math.max(0, 380 - racing);
+  document.getElementById('esc1-extra').textContent = fmt(extra1);
+  document.getElementById('esc1-resto').textContent = fmt(Math.max(0, general - extra1));
+  document.getElementById('esc2-extra').textContent = fmt(extra2);
+  document.getElementById('esc2-resto').textContent = fmt(Math.max(0, general - extra2));
+
+  // Week info
+  const meses = ['Septiembre 2025','Octubre 2025','Noviembre 2025','Diciembre 2025','Enero 2026','Febrero 2026','Marzo 2026','Abril 2026','Mayo 2026','Junio 2026','Julio 2026','Agosto 2026'];
+  const mesIdx = Math.min(Math.floor((sem-1)/4.33), 11);
+  document.getElementById('week-title').textContent = `Semana ${sem} de 52`;
+  document.getElementById('week-sub').textContent = meses[mesIdx] || 'Agosto 2026';
+}
+
+function resetApp() {
+  if (confirm('¿Seguro? Se borrarán todos los movimientos.')) {
+    movimientos = [];
+    save();
+    render();
+    updateObj();
+  }
+}
+
+// ── SERVICE WORKER ─────────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(() => {});
+}
+
+// ── INIT ───────────────────────────────────────────────────────
+render();
+updateObj();
+</script>
+</body>
+</html>
